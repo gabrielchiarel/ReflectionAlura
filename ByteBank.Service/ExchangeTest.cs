@@ -11,6 +11,5 @@ namespace ByteBank.Service
         private readonly Random _rdm = new();
         public decimal Calculate(string originCoin, string destinationCoin, decimal value) =>
             value * (decimal)_rdm.NextDouble();
-        
     }
 }

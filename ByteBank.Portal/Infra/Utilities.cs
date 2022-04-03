@@ -13,7 +13,7 @@ namespace ByteBank.Portal.Infra
             var splitedPath = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
             var lastSplit = splitedPath.Length > 0 ? splitedPath[splitedPath.Length - 1] : null;
 
-            return string.IsNullOrWhiteSpace(lastSplit) && lastSplit.Contains('.');
+            return !string.IsNullOrWhiteSpace(lastSplit) && lastSplit.Contains('.');
         }
         public static string PathConverterToAssemblyName(string path)
         {

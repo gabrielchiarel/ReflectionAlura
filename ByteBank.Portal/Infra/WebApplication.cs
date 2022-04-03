@@ -1,4 +1,4 @@
-﻿using ByteBank.Portal.Controllers;
+﻿using ByteBank.Portal.Controller;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,61 +41,16 @@ namespace ByteBank.Portal.Infra
             // indicates where the repository  is trying to access.
             var path = request.Url.AbsolutePath;
 
+            var handler = new RequestHandler();
+
             if (Utilities.IsFile(path))
             {
-                var assembly = Assembly.GetExecutingAssembly();
-
-                var resourceStream = assembly.GetManifestResourceStream(Utilities.PathConverterToAssemblyName(path));
-
-                if (resourceStream == null)
-                {
-                    response.StatusCode = 404;
-                    response.OutputStream.Close();
-                }
-                else
-                {
-                    var bytesResource = new byte[resourceStream.Length];
-
-                    resourceStream.Read(bytesResource, 0, (int)resourceStream.Length);
-
-                    response.ContentType = Utilities.GetContentType(path);
-                    response.StatusCode = 200;
-                    response.ContentLength64 = resourceStream.Length;
-
-                    response.OutputStream.Write(bytesResource, 0, bytesResource.Length);
-
-                    response.Close();
-                }
+                handler.FileHandler(response, path);
             }
-            else if (path == "/Cambio/MXN")
+            else
             {
-                var controller = new ExchangeController();
-                var pageContent = controller.GetMXN();
-
-                var fileBuffer = Encoding.UTF8.GetBytes(pageContent);
-
-                response.StatusCode = 200;
-                response.ContentType = "text/html; charset=utf-8";
-                response.ContentLength64 = fileBuffer.Length;
-                response.OutputStream.Write(fileBuffer, 0, fileBuffer.Length);
-
-                response.OutputStream.Close();
+                handler.ControllerHandler(response, path);
             }
-            else if (path == "/Cambio/USD")
-            {
-                var controller = new ExchangeController();
-                var pageContent = controller.GetUSD();
-
-                var fileBuffer = Encoding.UTF8.GetBytes(pageContent);
-
-                response.StatusCode = 200;
-                response.ContentType = "text/html; charset=utf-8";
-                response.ContentLength64 = fileBuffer.Length;
-                response.OutputStream.Write(fileBuffer, 0, fileBuffer.Length);
-
-                response.OutputStream.Close();
-            }
-
 
             httpListener.Stop();
         }
